@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body onload="chuyendong()">
+<canvas id="myCanvas" width="500px" height="650px" style="border:10px solid green; left: 400px;position: absolute"></canvas>
+<h2 id="diem" style="position: absolute; top: 20px;left: 270px"></h2>
+<button onclick="choi()" type="button" style="position: absolute; left: 270px;top: 100px">CHOI Game</button>
+<button onclick="dung()" type="button" style="position: absolute; left: 270px;top: 140px">RESET</button>
+
+<script>
+
+    let canvas = document.getElementById("myCanvas");
+    let text = canvas.getContext('2d');
+    let grd = text.createLinearGradient(0, 0, 1000, 0);
+    grd.addColorStop(0, "red");
+    grd.addColorStop(1, "blue");
+
+    let Bong = function (x1, y1, bankinh, vx, vy) {
+        this.trangthaibong=true;
+        this.x1 = x1;
+        this.y1 = y1;
+        this.bankinh = bankinh;
+        this.vx = vx;
+        this.vy = vy;
+        this.hinhtron = function () {
+            text.beginPath();
+            text.fillStyle = grd;
+            text.arc(this.x1, this.y1, this.bankinh, 0, Math.PI * 2);
+            text.stroke();
+            text.fill();
+        };
+        this.dichuyen = function (thanhdo) {
+            this.x1 += this.vx;
+            this.y1 += this.vy;
+            if (this.x1 > canvas.width - this.bankinh || this.x1 < 0) this.vx = -this.vx;
+            if (this.y1 < 0 ) this.vy = -this.vy;
+            if (this.x1 < thanhdo.x + (thanhdo.dai) && this.y1 < thanhdo.y + thanhdo.rong &&
+                this.x1 > thanhdo.x - (thanhdo.dai) && this.y1 > thanhdo.y - thanhdo.rong) {
+                this.vy = -vy
+            }
+        };
+        this.toadobandau = function () {
+            this.x1 = x1;
+            this.y1 = y1;
+        }
+
+    };
+    let Thanhdo = function (color, x, y, dai, rong, VX) {
+        this.VX = VX;
+        this.x = x;
+        this.y = y;
+        this.dai = dai;
+        this.rong = rong;
+        this.trangthai = "sangphai";
+        this.hinh = function () {
+            text.fillStyle = color;
+            text.fillRect(this.x, this.y, this.dai, this.rong);
+            text.stroke();
+        };
+        this.sangtrai = function () {
+            if (this.x <= canvas.width - this.dai)
+                this.x += this.VX
+        };
+        this.sangphai = function () {
+            if (this.x >= 0)
+                this.x += -this.VX
+        };
+        this.chuyenthanhdo = function () {
+            switch (this.trangthai) {
+                case "sangtrai":
+                    this.sangtrai();
+                    break;
+                case "sangphai":
+                    this.sangphai();
+                    break
+            }
+        }
+    };
+    let bong = new Bong(10, 10, 15, 1, 2);
+    let thanhdo = new Thanhdo("black", 50, 600, 100, 10, 2);
+    let count=0;
+    function diem() {
+
+        for (i=0 ; i<1 ; i++){
+            if (bong.x1 < thanhdo.x + (thanhdo.dai) && bong.y1 < thanhdo.y + thanhdo.rong &&
+                bong.x1 > thanhdo.x - (thanhdo.dai) && bong.y1 > thanhdo.y - thanhdo.rong) {
+                count+=1;
+            }
+        }
+        document.getElementById("diem").innerHTML="Diem: "+count
+    }
+
+    function dichuyenThanhdo(e) {
+        switch (e.keyCode) {
+            case 37:
+                thanhdo.trangthai = "sangphai";
+                break;
+            case 39:
+                thanhdo.trangthai = "sangtrai";
+                break;
+        }
+        console.log(thanhdo.trangthai)
+    }
+
+    function chuyendong() {
+        window.addEventListener("keydown", dichuyenThanhdo)
+    }
+    function trangthaichet() {
+        if(bong.y1 > canvas.height-bong.bankinh)
+        {
+            alert("thua roi");
+            clearInterval(start);
+            text.clearRect(0, 0, canvas.width, canvas.height)
+        }
+    }
+    let start;
+    function GameStart() {
+        start = setInterval(function () {
+            text.clearRect(0, 0, canvas.width, canvas.height);
+            bong.hinhtron();
+            bong.dichuyen(thanhdo);
+            thanhdo.hinh();
+            thanhdo.chuyenthanhdo();
+            chuyendong();
+            trangthaichet();
+            diem();
+
+        }, 1);
+    }
+    bong.hinhtron();
+    thanhdo.hinh();
+    function dung() {
+        window.location.reload()
+    }
+   function choi() {
+       GameStart()
+   }
+
+</script>
+</body>
+</html>
